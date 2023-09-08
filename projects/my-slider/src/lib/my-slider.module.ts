@@ -1,4 +1,4 @@
-import {NgModule} from '@angular/core';
+import {createComponent, EnvironmentInjector, inject, NgModule, Type} from '@angular/core';
 import {MySliderComponent} from './my-slider.component';
 import {MySliderDirective} from "./my-slider.directive";
 

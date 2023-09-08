@@ -1,4 +1,14 @@
-import {ComponentRef, Directive, ElementRef, inject, Input, OnInit, Renderer2, ViewContainerRef} from "@angular/core";
+import {
+  ComponentRef,
+  Directive,
+  ElementRef,
+  EmbeddedViewRef,
+  inject,
+  Input,
+  OnInit,
+  Renderer2,
+  ViewContainerRef
+} from "@angular/core";
 
 @Directive({
   selector: '[sliderHost]',
@@ -6,8 +16,7 @@ import {ComponentRef, Directive, ElementRef, inject, Input, OnInit, Renderer2, V
 export class MySliderDirective implements OnInit {
   viewContainerRef = inject(ViewContainerRef);
   renderer = inject(Renderer2);
-  el = inject(ElementRef)
-
+  el = inject(ElementRef);
   protected _items: (ComponentRef<any> | string)[] = [];
 
   @Input('items') set items(items: (ComponentRef<any> | string)[]) {
@@ -28,8 +37,13 @@ export class MySliderDirective implements OnInit {
   }
 
   loadComponent(item: ComponentRef<any>) {
-    if (item)
-      this.viewContainerRef.insert(item.hostView);
+    if (item) {
+      const viewRef = item.hostView as EmbeddedViewRef<any>;
+      const container = this.renderer.createElement('div');
+      this.renderer.addClass(container, 'slide');
+      this.renderer.appendChild(container, viewRef.rootNodes[0]);
+      this.viewContainerRef.insert(container);
+    }
   }
 
   loadImage(image: string) {
@@ -38,10 +52,14 @@ export class MySliderDirective implements OnInit {
     }
 
     if (image) {
-      const imgElement = this.renderer.createElement('img');
+      const slideDiv = this.renderer.createElement('div');
+      this.renderer.addClass(slideDiv, 'slide');
 
+      const imgElement = this.renderer.createElement('img');
       this.renderer.setAttribute(imgElement, 'src', image);
-      this.renderer.appendChild(this.el.nativeElement, imgElement);
+
+      this.renderer.appendChild(slideDiv, imgElement);
+      this.renderer.appendChild(this.el.nativeElement, slideDiv);
     }
   }
 
